@@ -3,30 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mi San Valentín ❤️</title>
+    <title>Una sorpresa para ti ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS - El diseño y la magia visual */
-
-        /* Esto se activa solo en pantallas de menos de 480px de ancho */
-@media (max-width: 480px) {
-    .sobre {
-        width: 260px; /* Un poco más angosto */
-        height: 180px;
-    }
-    
-    .sobre::before {
-        border-left: 130px solid transparent;
-        border-right: 130px solid transparent;
-        border-top: 90px solid #ff758f;
-    }
-
-    .carta {
-        width: 230px;
-        font-size: 0.8rem; /* Texto un poco más pequeño para que quepa */
-    }
-}
         :root {
+            --color-fondo: #ffccd5;
             --color-sobre: #ff4d6d;
+            --color-sobre-claro: #ff758f;
             --color-carta: #fff0f3;
             --color-texto: #590d22;
         }
@@ -37,118 +20,149 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #ffb3c1;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-fondo);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
         }
 
-        .contenedor-carta {
+        .contenedor-sobre {
             position: relative;
+            width: 320px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        /* La Carta */
+        .carta {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translate(-50%, 0); /* Posición inicial dentro */
+            width: 280px;
+            background-color: var(--color-carta);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1;
+            transition: transform 0.7s ease-in-out, opacity 0.3s;
+            text-align: center;
+            box-sizing: border-box;
+            opacity: 0;
+            pointer-events: none; /* No clickable cuando está cerrada */
+        }
+
+        .carta h2 { margin: 0 0 10px; color: var(--color-texto); font-size: 1.2rem; }
+        .carta p { color: #800f2f; font-size: 0.95rem; margin-bottom: 15px; }
+
+        .btn-si {
+            background-color: var(--color-sobre);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
             cursor: pointer;
         }
 
         /* El Sobre */
         .sobre {
-            position: relative;
-            width: 340px;
-            height: 220px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
             background-color: var(--color-sobre);
             border-radius: 0 0 10px 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        /* La solapa del sobre */
-        .sobre::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 100px solid #ff758f;
-            transition: transform 0.5s ease;
-            transform-origin: top;
             z-index: 3;
         }
 
-        /* La Carta oculta */
-        .carta {
+        /* Tapa del sobre */
+        .tapa {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 260px;
-            height: 160px;
-            background-color: var(--color-carta);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.6s ease;
-            z-index: 2;
-            box-sizing: border-box;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .carta h2 {
-            margin: 0;
-            color: var(--color-texto);
-            font-size: 1.2rem;
-        }
-
-        .carta p {
-            font-size: 0.9rem;
-            color: #800f2f;
-        }
-
-        /* Animación cuando se abre */
-        .contenedor-carta.abierto .sobre::before {
-            transform: rotateX(180deg);
-            z-index: 1;
-        }
-
-        .contenedor-carta.abierto .carta {
-            transform: translate(-50%, -100px);
-            height: 220px;
-        }
-
-        .corazon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 2rem;
+            top: 0;
+            left: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid var(--color-sobre-claro);
+            transform-origin: top;
+            transition: transform 0.5s ease;
             z-index: 4;
-            transition: opacity 0.3s;
         }
 
-        .contenedor-carta.abierto .corazon {
-            opacity: 0;
+        /* ESTADO ABIERTO */
+        .abierto .tapa {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+
+        .abierto .carta {
+            transform: translate(-50%, -185px); /* Sale hacia arriba */
+            opacity: 1;
+            z-index: 5;
+            pointer-events: auto; /* Se vuelve clickable */
+        }
+
+        .instruccion {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            text-align: center;
+            color: #ff4d6d;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="contenedor-carta" onclick="abrirCarta()">
-        <div class="corazon">❤️</div>
+    <div class="contenedor-sobre" id="miSobre" onclick="gestionarCarta()">
+        <div class="tapa"></div>
         <div class="sobre"></div>
+        
         <div class="carta">
-            <h2>¡Feliz San Valentín!</h2>
-            <p>Yo se que eres lambucia pero dale tiempo al tiempo🌹</p>
-            <p><strong>¿ta bacano Verdad?</strong></p>
+            <h2>¡Feliz San Valentín! ❤️</h2>
+            <p>MARIANNY ERES UNA LOQUITA, TE QUIERO MUCHO</p>
+            <button class="btn-si" onclick="lanzarConfeti(event)">¡LAMBUCIA TOCAME! 🌹</button>
+            <p style="font-size: 0.7rem; margin-top: 10px; color: #aaa;">(Toca el sobre para cerrar)</p>
         </div>
+
+        <div class="instruccion">Toca para abrir o cerrar ✨</div>
     </div>
 
     <script>
-        // JavaScript - La interacción
-        function abrirCarta() {
-            const contenedor = document.querySelector('.contenedor-carta');
-            contenedor.classList.toggle('abierto');
-            
-            // Un toque extra: Confeti de corazones si se abre
-            if(contenedor.classList.contains('abierto')) {
-                console.log("¡Carta abierta con éxito!");
-            }
+        // Esta función ahora abre y cierra
+        function gestionarCarta() {
+            const sobre = document.getElementById('miSobre');
+            sobre.classList.toggle('abierto');
+        }
+
+        function lanzarConfeti(event) {
+            // Evitamos que al dar clic al botón se cierre la carta inmediatamente
+            event.stopPropagation();
+
+            var end = Date.now() + (3 * 1000);
+
+            (function frame() {
+              confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#ff4d6d', '#ff758f', '#ffffff']
+              });
+              confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#ff4d6d', '#ff758f', '#ffffff']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
         }
     </script>
-
 </body>
 </html>
